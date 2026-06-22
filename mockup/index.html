@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Atlas Hub — Morocco World Cup 2026</title>
+<style>
+  :root{
+    --red:#C1272D;       /* Morocco red */
+    --green:#006233;     /* Morocco green */
+    --green-deep:#00451f;
+    --ink:#0d1b14;
+    --paper:#f6f7f4;
+    --card:#ffffff;
+    --muted:#6b7a72;
+    --line:#e6eae6;
+    --gold:#E0B43A;
+    --shadow:0 10px 30px rgba(13,27,20,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #11321f 0%, #0a1f14 45%, #07150d 100%);
+    color:var(--ink);
+    display:flex;justify-content:center;align-items:flex-start;
+    padding:28px 14px 60px;min-height:100vh;
+  }
+
+  /* phone frame */
+  .phone{
+    width:390px;max-width:100%;
+    background:var(--paper);
+    border-radius:42px;
+    box-shadow:0 30px 80px rgba(0,0,0,.55), inset 0 0 0 9px #0c0c0e, inset 0 0 0 11px #2a2a2e;
+    overflow:hidden;position:relative;
+  }
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:150px;height:26px;background:#0c0c0e;border-radius:0 0 18px 18px;z-index:40}
+  .screen{height:812px;overflow-y:auto;overflow-x:hidden;position:relative;scrollbar-width:none}
+  .screen::-webkit-scrollbar{display:none}
+
+  /* ====== HERO / HEADER ====== */
+  .hero{
+    background:
+      linear-gradient(180deg, var(--green-deep) 0%, var(--green) 78%);
+    color:#fff;padding:46px 20px 26px;position:relative;overflow:hidden;
+  }
+  .hero::after{content:"";position:absolute;right:-40px;top:-30px;width:180px;height:180px;
+    background:radial-gradient(circle, rgba(224,180,58,.25), transparent 70%);}
+  .brandrow{display:flex;align-items:center;gap:10px;position:relative;z-index:2}
+  .star{width:34px;height:34px;display:grid;place-items:center;
+    background:var(--red);border-radius:10px;box-shadow:0 6px 16px rgba(193,39,45,.45);
+    font-size:18px}
+  .brand{font-weight:800;letter-spacing:.3px;font-size:18px}
+  .brand small{display:block;font-weight:500;opacity:.8;font-size:11px;letter-spacing:.6px;text-transform:uppercase}
+  .live{margin-left:auto;font-size:11px;font-weight:700;background:rgba(255,255,255,.14);
+    padding:5px 10px;border-radius:999px;display:flex;align-items:center;gap:6px}
+  .dot{width:7px;height:7px;border-radius:50%;background:#7CFC9A;box-shadow:0 0 0 0 rgba(124,252,154,.7);
+    animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,252,154,.6)}70%{box-shadow:0 0 0 8px rgba(124,252,154,0)}100%{box-shadow:0 0 0 0 rgba(124,252,154,0)}}
+
+  /* next match card */
+  .matchcard{position:relative;z-index:2;margin-top:20px;
+    background:rgba(255,255,255,.10);backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:18px}
+  .mc-top{display:flex;justify-content:space-between;align-items:center;font-size:11px;
+    text-transform:uppercase;letter-spacing:1px;opacity:.85;font-weight:700}
+  .mc-top .grp{background:var(--gold);color:#3a2c00;padding:3px 8px;border-radius:6px}
+  .teams{display:flex;align-items:center;justify-content:space-between;margin:16px 4px 6px}
+  .team{display:flex;flex-direction:column;align-items:center;gap:8px;width:96px}
+  .flag{font-size:40px;line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+  .team b{font-size:15px;font-weight:800}
+  .vs{font-weight:800;font-size:13px;opacity:.7}
+
+  .count{display:flex;justify-content:center;gap:10px;margin-top:14px}
+  .cbox{background:rgba(0,0,0,.22);border-radius:12px;padding:8px 10px;text-align:center;min-width:58px}
+  .cbox b{display:block;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+  .cbox span{font-size:9px;letter-spacing:1px;opacity:.75;text-transform:uppercase}
+
+  .mc-foot{display:flex;gap:14px;margin-top:16px;font-size:12.5px}
+  .mc-foot div{display:flex;align-items:center;gap:6px;opacity:.95}
+  .mc-foot .ico{opacity:.85}
+
+  /* time pills: local vs Morocco */
+  .times{display:flex;gap:8px;margin-top:14px}
+  .pill{flex:1;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);
+    border-radius:12px;padding:9px 10px}
+  .pill small{display:block;font-size:9.5px;letter-spacing:.6px;opacity:.7;text-transform:uppercase}
+  .pill b{font-size:15px;font-weight:800}
+
+  /* ====== BODY ====== */
+  .body{padding:18px 16px 30px}
+  .sec-title{font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
+    color:var(--muted);margin:18px 4px 12px;display:flex;align-items:center;gap:8px}
+  .sec-title::before{content:"";width:14px;height:2px;background:var(--red);border-radius:2px}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;
+    box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .tile .em{font-size:26px;display:block;margin-bottom:10px}
+  .tile h4{font-size:14.5px;font-weight:800;margin-bottom:3px;color:var(--ink)}
+  .tile p{font-size:11.5px;color:var(--muted);line-height:1.4}
+  .tile .tag{position:absolute;top:12px;right:12px;font-size:9px;font-weight:800;
+    background:#eef6ef;color:var(--green);padding:3px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px}
+  .tile.wide{grid-column:1 / -1;display:flex;align-items:center;gap:14px}
+  .tile.wide .em{margin:0;font-size:30px}
+
+  /* city selector */
+  .cities{display:flex;gap:8px;overflow-x:auto;padding:2px 4px 6px;scrollbar-width:none}
+  .cities::-webkit-scrollbar{display:none}
+  .chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);
+    border-radius:999px;padding:9px 14px;font-size:12.5px;font-weight:700;color:var(--muted)}
+  .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chip .f{margin-right:5px}
+
+  /* alert banner */
+  .alert{background:linear-gradient(135deg,var(--red),#9c1f24);color:#fff;border-radius:20px;
+    padding:18px;box-shadow:0 14px 30px rgba(193,39,45,.35);position:relative;overflow:hidden;margin-top:6px}
+  .alert::after{content:"🎟️";position:absolute;right:-6px;bottom:-12px;font-size:84px;opacity:.18}
+  .alert h3{font-size:16px;font-weight:800;margin-bottom:5px}
+  .alert p{font-size:12px;opacity:.92;line-height:1.45;max-width:80%}
+  .emailrow{display:flex;gap:8px;margin-top:14px;position:relative;z-index:2}
+  .emailrow input{flex:1;border:none;border-radius:12px;padding:12px 13px;font-size:13px;color:var(--ink)}
+  .emailrow button{border:none;border-radius:12px;padding:0 16px;font-weight:800;font-size:13px;
+    background:var(--ink);color:#fff;white-space:nowrap}
+  .alert .micro{font-size:10px;opacity:.8;margin-top:9px}
+
+  /* fan zone highlight */
+  .fanzone{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;
+    box-shadow:var(--shadow)}
+  .fz-banner{height:96px;background:
+      linear-gradient(120deg, rgba(0,98,51,.92), rgba(193,39,45,.92)),
+      radial-gradient(circle at 80% 20%, rgba(224,180,58,.5), transparent 60%);
+    display:flex;align-items:flex-end;padding:12px 14px;color:#fff;position:relative}
+  .fz-banner b{font-size:16px;font-weight:800}
+  .fz-banner .stars{position:absolute;top:10px;right:14px;font-size:18px;letter-spacing:3px;opacity:.9}
+  .fz-body{padding:14px}
+  .fz-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted);margin-bottom:8px}
+  .fz-row:last-child{margin-bottom:0}
+  .fz-row .i{width:22px;text-align:center}
+  .fz-row b{color:var(--ink)}
+
+  /* transport step */
+  .steps{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:6px 16px;box-shadow:var(--shadow)}
+  .step{display:flex;gap:12px;padding:13px 0;border-bottom:1px dashed var(--line)}
+  .step:last-child{border-bottom:none}
+  .step .num{width:26px;height:26px;flex:none;border-radius:8px;background:#eef6ef;color:var(--green);
+    font-weight:800;font-size:12px;display:grid;place-items:center}
+  .step .txt b{font-size:13.5px;display:block;margin-bottom:2px}
+  .step .txt p{font-size:11.5px;color:var(--muted);line-height:1.4}
+  .step.warn .num{background:#fdeceb;color:var(--red)}
+  .warnpill{display:inline-block;font-size:9.5px;font-weight:800;background:#fdeceb;color:var(--red);
+    padding:2px 7px;border-radius:5px;margin-top:5px;letter-spacing:.4px}
+
+  /* footer / tabbar */
+  .tabbar{position:sticky;bottom:0;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+    border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:10px 4px 16px;z-index:30}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--muted);font-weight:600}
+  .tab.active{color:var(--green)}
+  .tab .ti{font-size:20px}
+
+  .madeby{text-align:center;font-size:10.5px;color:var(--muted);padding:18px 0 6px}
+  .madeby b{color:var(--green)}
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+
+      <!-- HERO -->
+      <header class="hero">
+        <div class="brandrow">
+          <div class="star">⭐</div>
+          <div class="brand">Atlas Hub<small>Morocco · World Cup 2026</small></div>
+          <div class="live"><span class="dot"></span>LIVE</div>
+        </div>
+
+        <div class="matchcard">
+          <div class="mc-top">
+            <span>Next Match</span>
+            <span class="grp">Group C</span>
+          </div>
+          <div class="teams">
+            <div class="team"><div class="flag">🇲🇦</div><b>Morocco</b></div>
+            <div class="vs">VS</div>
+            <div class="team"><div class="flag">🇭🇹</div><b>Haiti</b></div>
+          </div>
+
+          <div class="count">
+            <div class="cbox"><b>01</b><span>Days</span></div>
+            <div class="cbox"><b>18</b><span>Hours</span></div>
+            <div class="cbox"><b>42</b><span>Min</span></div>
+          </div>
+
+          <div class="times">
+            <div class="pill"><small>📍 Atlanta (ET)</small><b>6:00 PM</b></div>
+            <div class="pill"><small>🇲🇦 Morocco time</small><b>12:00 AM</b></div>
+          </div>
+
+          <div class="mc-foot">
+            <div><span class="ico">🏟️</span> Mercedes-Benz Stadium</div>
+            <div><span class="ico">📅</span> Wed, Jun 24</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- BODY -->
+      <main class="body">
+
+        <!-- Ticket alert (email capture) -->
+        <div class="sec-title">Ticket Alerts</div>
+        <div class="alert">
+          <h3>Don't miss a ticket drop 🎟️</h3>
+          <p>FIFA releases new ticket batches daily at <b>11:00 AM ET</b>. Get an email the moment seats open.</p>
+          <div class="emailrow">
+            <input placeholder="your@email.com" />
+            <button>Alert me</button>
+          </div>
+          <div class="micro">Free for Moroccan fans · Unsubscribe anytime</div>
+        </div>
+
+        <!-- City selector -->
+        <div class="sec-title">Your Host City</div>
+        <div class="cities">
+          <div class="chip active"><span class="f">🍑</span>Atlanta</div>
+          <div class="chip"><span class="f">🗽</span>New York</div>
+          <div class="chip"><span class="f">🦞</span>Boston</div>
+        </div>
+
+        <!-- Essentials grid -->
+        <div class="sec-title">Essentials Near You</div>
+        <div class="grid">
+          <div class="tile">
+            <span class="em">🕌</span>
+            <span class="tag">3 near</span>
+            <h4>Mosques</h4>
+            <p>Prayer times & nearest masjid to the stadium</p>
+          </div>
+          <div class="tile">
+            <span class="em">🥙</span>
+            <span class="tag">12 spots</span>
+            <h4>Halal Food</h4>
+            <p>Verified halal restaurants & groceries</p>
+          </div>
+          <div class="tile wide">
+            <span class="em">🚇</span>
+            <div>
+              <h4>Get to the Stadium</h4>
+              <p>MARTA route, timing & the buy-ahead trap</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transport steps -->
+        <div class="sec-title">Stadium Transport — Atlanta</div>
+        <div class="steps">
+          <div class="step">
+            <div class="num">1</div>
+            <div class="txt"><b>Take MARTA rail</b><p>Blue or Green line toward downtown — avoid driving, parking fills early.</p></div>
+          </div>
+          <div class="step">
+            <div class="num">2</div>
+            <div class="txt"><b>Get off at Vine City or GWCC</b><p>Short 5-min walk to Mercedes-Benz Stadium gates.</p></div>
+          </div>
+          <div class="step warn">
+            <div class="num">!</div>
+            <div class="txt"><b>Leave 90 min early</b><p>Security & crowd lines are long on matchday.</p>
+              <span class="warnpill">⚠ Tickets are digital-only via FIFA app</span></div>
+          </div>
+        </div>
+
+        <!-- Fan zone -->
+        <div class="sec-title">Moroccan Fan Zone</div>
+        <div class="fanzone">
+          <div class="fz-banner">
+            <span class="stars">★ ★ ★</span>
+            <b>Atlas Lions Gathering 🦁</b>
+          </div>
+          <div class="fz-body">
+            <div class="fz-row"><span class="i">📍</span><b>Centennial Olympic Park</b></div>
+            <div class="fz-row"><span class="i">🕒</span>Opens <b>2:00 PM</b> · 4h before kickoff</div>
+            <div class="fz-row"><span class="i">🥁</span>Drums, chants & screens — find your people</div>
+          </div>
+        </div>
+
+        <div class="madeby">Built with ❤️ for Moroccan fans · by <b>@said</b></div>
+      </main>
+
+      <!-- TAB BAR -->
+      <nav class="tabbar">
+        <div class="tab active"><span class="ti">🏠</span>Home</div>
+        <div class="tab"><span class="ti">⚽</span>Matches</div>
+        <div class="tab"><span class="ti">🗺️</span>Nearby</div>
+        <div class="tab"><span class="ti">🔔</span>Alerts</div>
+      </nav>
+
+    </div>
+  </div>
+</body>
+</html>
