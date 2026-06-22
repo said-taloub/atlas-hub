@@ -16,10 +16,13 @@ function fmtTime(iso: string, tz?: string) {
 }
 
 function fmtDate(iso: string) {
+  // Show the date in the venue (ET) time zone to match the displayed kickoff,
+  // so a fan viewing from Morocco still sees the correct matchday.
   return new Intl.DateTimeFormat("en-US", {
     weekday: "short",
     month: "short",
     day: "numeric",
+    timeZone: "America/New_York",
   }).format(new Date(iso));
 }
 
