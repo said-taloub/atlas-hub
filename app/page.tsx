@@ -1,9 +1,20 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CITIES, MATCHES, nextMatch, type City } from "@/lib/data";
+import {
+  CITIES,
+  MATCHES,
+  googleMapsUrl,
+  isDone,
+  moroccoPoints,
+  nearestCity,
+  nextMatch,
+  wazeUrl,
+  type City,
+} from "@/lib/data";
 import Countdown from "./Countdown";
 import SignupForm from "./SignupForm";
+import Essentials from "./Essentials";
 
 const MOROCCO_TZ = "Africa/Casablanca";
 
@@ -27,15 +38,52 @@ function fmtDate(iso: string) {
 }
 
 export default function Page() {
-  const match = nextMatch() ?? MATCHES[0];
-  const [city, setCity] = useState<City>(match.city);
+  const match = nextMatch();
+  // The host city always follows Morocco's next match (or the last one played
+  // if the journey is over). It is not manually selectable anymore.
+  const city: City = (match ?? MATCHES[MATCHES.length - 1]).city;
   const info = CITIES[city];
 
-  const localTime = useMemo(() => fmtTime(match.kickoff), [match.kickoff]);
-  const moroccoTime = useMemo(
-    () => fmtTime(match.kickoff, MOROCCO_TZ),
-    [match.kickoff]
+  // Geolocation is informational only: it tells the fan which host city they're
+  // closest to, without overriding the next-match city.
+  const [geoState, setGeoState] = useState<"idle" | "locating" | "done" | "denied">(
+    "idle"
   );
+  const [geoCity, setGeoCity] = useState<City | null>(null);
+  const geoMatch = geoState === "done" && geoCity === city;
+
+  // True when Morocco has a confirmed knockout spot but the next opponent/venue
+  // isn't scheduled yet — drives the "next round venue" loading placeholder.
+  const nextRoundPending = match !== null && !match.confirmed;
+
+  const localTime = useMemo(
+    () => (match ? fmtTime(match.kickoff) : ""),
+    [match]
+  );
+  const moroccoTime = useMemo(
+    () => (match ? fmtTime(match.kickoff, MOROCCO_TZ) : ""),
+    [match]
+  );
+
+  function useMyLocation() {
+    if (!("geolocation" in navigator)) {
+      setGeoState("denied");
+      return;
+    }
+    setGeoState("locating");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const nearest = nearestCity({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+        setGeoCity(nearest);
+        setGeoState("done");
+      },
+      () => setGeoState("denied"),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 }
+    );
+  }
 
   return (
     <div className="app">
@@ -53,41 +101,54 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="matchcard">
-          <div className="mc-top">
-            <span>Next Match</span>
-            <span className="grp">{match.group}</span>
-          </div>
-          <div className="teams">
-            <div className="team">
-              <div className="flag">🇲🇦</div>
-              <b>Morocco</b>
+        {match ? (
+          <div className="matchcard">
+            <div className="mc-top">
+              <span>Next Match</span>
+              <span className="grp">{match.round}</span>
             </div>
-            <div className="vs">VS</div>
-            <div className="team">
-              <div className="flag">{match.opponentFlag}</div>
-              <b>{match.opponent}</b>
+            <div className="teams">
+              <div className="team">
+                <div className="flag">🇲🇦</div>
+                <b>Morocco</b>
+              </div>
+              <div className="vs">VS</div>
+              <div className="team">
+                <div className="flag">{match.opponentFlag}</div>
+                <b>{match.confirmed ? match.opponent : "TBD"}</b>
+              </div>
             </div>
-          </div>
 
-          <Countdown kickoff={match.kickoff} />
+            <Countdown kickoff={match.kickoff} />
 
-          <div className="times">
-            <div className="pill">
-              <small>📍 {match.cityLabel} (ET)</small>
-              <b>{localTime}</b>
+            <div className="times">
+              <div className="pill">
+                <small>📍 {match.cityLabel} (ET)</small>
+                <b>{localTime}</b>
+              </div>
+              <div className="pill">
+                <small>🇲🇦 Morocco time</small>
+                <b>{moroccoTime}</b>
+              </div>
             </div>
-            <div className="pill">
-              <small>🇲🇦 Morocco time</small>
-              <b>{moroccoTime}</b>
+
+            <div className="mc-foot">
+              <div>🏟️ {match.stadium}</div>
+              <div>📅 {fmtDate(match.kickoff)}</div>
             </div>
           </div>
-
-          <div className="mc-foot">
-            <div>🏟️ {match.stadium}</div>
-            <div>📅 {fmtDate(match.kickoff)}</div>
+        ) : (
+          <div className="matchcard">
+            <div className="mc-top">
+              <span>The journey</span>
+              <span className="grp">{moroccoPoints()} pts</span>
+            </div>
+            <p style={{ marginTop: 12, fontSize: 14, opacity: 0.9 }}>
+              No upcoming match scheduled yet. Check back for the next round —
+              Dima Maghrib! 🇲🇦
+            </p>
           </div>
-        </div>
+        )}
       </header>
 
       <main className="body">
@@ -102,44 +163,94 @@ export default function Page() {
           <SignupForm />
         </div>
 
-        {/* CITY SELECTOR */}
+        {/* MOROCCO'S JOURNEY */}
+        <div className="sec-title">Morocco&apos;s Journey</div>
+        <div className="journey">
+          {MATCHES.map((m, i) => {
+            const done = isDone(m);
+            const win =
+              done && m.result!.morocco > m.result!.opponent;
+            const draw =
+              done && m.result!.morocco === m.result!.opponent;
+            const badge = !done
+              ? "next"
+              : win
+              ? "win"
+              : draw
+              ? "draw"
+              : "loss";
+            return (
+              <div key={i} className={`jrow ${badge}`}>
+                <div className="jdate">{fmtDate(m.kickoff)}</div>
+                <div className="jmatch">
+                  <span className="jflags">
+                    🇲🇦 <b>{m.confirmed ? m.opponent : "TBD"}</b> {m.opponentFlag}
+                  </span>
+                  <span className="jround">
+                    {m.round} · {m.cityLabel}
+                  </span>
+                </div>
+                <div className="jscore">
+                  {done ? (
+                    <b>
+                      {m.result!.morocco}–{m.result!.opponent}
+                    </b>
+                  ) : (
+                    <span className="jnext">NEXT</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* HOST CITY — anchored on the next match's city */}
         <div className="sec-title">Your Host City</div>
         <div className="cities">
-          {Object.values(CITIES).map((c) => (
-            <button
-              key={c.id}
-              className={`chip ${c.id === city ? "active" : ""}`}
-              onClick={() => setCity(c.id)}
-            >
-              <span className="f">{c.flag}</span>
-              {c.label}
-            </button>
-          ))}
+          <div className={`chip active ${geoMatch ? "geo-on" : ""}`}>
+            <span className="f">{info.flag}</span>
+            {info.label}
+            {match ? <span className="chip-sub">Next match</span> : null}
+          </div>
+          <button
+            className="chip geo"
+            onClick={useMyLocation}
+            disabled={geoState === "locating"}
+          >
+            📍 {geoState === "locating" ? "Locating…" : "Near me"}
+          </button>
         </div>
+        {geoState === "done" && !geoMatch && (
+          <div className="geo-hint">
+            You&apos;re closest to <b>{CITIES[geoCity!].label}</b> — but Morocco
+            plays next in <b>{info.label}</b>.
+          </div>
+        )}
+        {geoState === "denied" && (
+          <div className="geo-hint">
+            Couldn&apos;t get your location — that&apos;s okay, the host city
+            follows Morocco&apos;s next match.
+          </div>
+        )}
+
+        {/* Placeholder for the next round, shown once Morocco advances but the
+            opponent/venue isn't scheduled yet. */}
+        {nextRoundPending && (
+          <div className="nextcity-loading">
+            <span className="spinner" />
+            <div>
+              <b>Next round venue</b>
+              <p>
+                Morocco advanced 🎉 — the next opponent &amp; host city drop soon.
+                This updates automatically.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* ESSENTIALS */}
         <div className="sec-title">Essentials Near You</div>
-        <div className="grid">
-          <div className="tile">
-            <span className="em">🕌</span>
-            <span className="tag">{info.mosques} near</span>
-            <h4>Mosques</h4>
-            <p>Prayer times &amp; nearest masjid to the stadium</p>
-          </div>
-          <div className="tile">
-            <span className="em">🥙</span>
-            <span className="tag">{info.halal} spots</span>
-            <h4>Halal Food</h4>
-            <p>Verified halal restaurants &amp; groceries</p>
-          </div>
-          <div className="tile wide">
-            <span className="em">🚇</span>
-            <div>
-              <h4>Get to the Stadium</h4>
-              <p>Route, timing &amp; the buy-ahead trap</p>
-            </div>
-          </div>
-        </div>
+        <Essentials city={city} />
 
         {/* TRANSPORT */}
         <div className="sec-title">Stadium Transport — {info.label}</div>
@@ -158,6 +269,24 @@ export default function Page() {
               </div>
             </div>
           ))}
+          <div className="nav-btns">
+            <a
+              className="nav-btn maps"
+              href={googleMapsUrl(info.stadium.coords, info.stadium.name)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              🗺️ Directions (Maps)
+            </a>
+            <a
+              className="nav-btn waze"
+              href={wazeUrl(info.stadium.coords)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              🚗 Waze
+            </a>
+          </div>
         </div>
 
         {/* FAN ZONE */}
@@ -180,6 +309,14 @@ export default function Page() {
               <span className="i">🥁</span>
               {info.fanZone.note}
             </div>
+            <a
+              className="nav-btn maps full"
+              href={googleMapsUrl(info.fanZone.coords, info.fanZone.place)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              🗺️ Directions to the fan zone
+            </a>
           </div>
         </div>
 

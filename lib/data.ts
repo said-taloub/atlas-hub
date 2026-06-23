@@ -5,45 +5,124 @@
 
 export type City = "atlanta" | "newyork" | "boston";
 
+export interface MatchResult {
+  morocco: number;
+  opponent: number;
+  /** Short note, e.g. "Saibari 11s — fastest WC goal in Morocco history". */
+  note?: string;
+}
+
 export interface Match {
   opponent: string;
   opponentFlag: string;
-  group: string;
+  /** "Group C", "Round of 32", "Round of 16", etc. */
+  round: string;
   city: City;
   cityLabel: string;
   stadium: string;
   /** Kickoff in ISO 8601 with venue offset, e.g. 2026-06-24T18:00:00-04:00 */
   kickoff: string;
-  status: "upcoming" | "live" | "done";
+  /** Whether the opponent is confirmed (false for future knockout rounds). */
+  confirmed: boolean;
+  /** Present only once the match is finished. */
+  result?: MatchResult;
 }
 
+// Morocco's full World Cup 2026 journey — the single source of truth.
+// The whole app (next match, host city, transport, fan zone) derives from it.
+//
+// ── HOW TO UPDATE (manual / via the /update skill) ──────────────────────────
+// 1. A MATCH JUST FINISHED → add a `result` to that match object:
+//        result: { morocco: 2, opponent: 0, note: "..." }
+//    The app auto-advances: that game shows its score, the next becomes NEXT,
+//    and the host city / transport / fan zone follow the new next match.
+//
+// 2. MOROCCO ADVANCED but the next opponent/venue isn't announced yet → append
+//    a match with `confirmed: false` and a best-guess city. The Home shows a
+//    "next round venue" loading placeholder until you flip it to confirmed.
+//
+// 3. NEXT OPPONENT ANNOUNCED → set `confirmed: true` and fill opponent/flag/
+//    stadium/kickoff. If it's a new host city, add it to CITIES below too.
+// ────────────────────────────────────────────────────────────────────────────
 export const MATCHES: Match[] = [
+  {
+    opponent: "Brazil",
+    opponentFlag: "🇧🇷",
+    round: "Group C",
+    city: "newyork",
+    cityLabel: "New York",
+    stadium: "MetLife Stadium",
+    kickoff: "2026-06-13T18:00:00-04:00",
+    confirmed: true,
+    result: { morocco: 1, opponent: 1, note: "A heroic draw against Brazil" },
+  },
+  {
+    opponent: "Scotland",
+    opponentFlag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+    round: "Group C",
+    city: "boston",
+    cityLabel: "Boston",
+    stadium: "Gillette Stadium",
+    kickoff: "2026-06-20T15:00:00-04:00",
+    confirmed: true,
+    result: {
+      morocco: 1,
+      opponent: 0,
+      note: "Saibari scores the fastest WC goal in Morocco history",
+    },
+  },
   {
     opponent: "Haiti",
     opponentFlag: "🇭🇹",
-    group: "Group C",
+    round: "Group C",
     city: "atlanta",
     cityLabel: "Atlanta",
     stadium: "Mercedes-Benz Stadium",
     kickoff: "2026-06-24T18:00:00-04:00",
-    status: "upcoming",
+    confirmed: true,
   },
 ];
 
-/** Returns the next non-finished match, or null. */
-export function nextMatch(now: Date = new Date()): Match | null {
-  const upcoming = MATCHES.filter(
-    (m) => new Date(m.kickoff).getTime() > now.getTime() - 2 * 60 * 60 * 1000
-  ).sort((a, b) => +new Date(a.kickoff) - +new Date(b.kickoff));
-  return upcoming[0] ?? null;
+/** A finished match has a result. */
+export function isDone(m: Match): boolean {
+  return m.result !== undefined;
+}
+
+/** Returns the next not-yet-finished match, or null if the journey is over. */
+export function nextMatch(): Match | null {
+  return MATCHES.find((m) => !isDone(m)) ?? null;
+}
+
+/** Points earned so far (3 win / 1 draw / 0 loss) across finished group games. */
+export function moroccoPoints(): number {
+  return MATCHES.filter(isDone).reduce((pts, m) => {
+    const r = m.result!;
+    if (r.morocco > r.opponent) return pts + 3;
+    if (r.morocco === r.opponent) return pts + 1;
+    return pts;
+  }, 0);
+}
+
+export interface GeoPoint {
+  lat: number;
+  lng: number;
 }
 
 export interface CityInfo {
   id: City;
   label: string;
   flag: string;
+  /** City center, used to find the nearest host city from device GPS. */
+  center: GeoPoint;
+  stadium: { name: string; coords: GeoPoint };
   transport: { title: string; detail: string; warn?: boolean }[];
-  fanZone: { name: string; place: string; opens: string; note: string };
+  fanZone: {
+    name: string;
+    place: string;
+    opens: string;
+    note: string;
+    coords: GeoPoint;
+  };
   mosques: number;
   halal: number;
 }
@@ -53,6 +132,11 @@ export const CITIES: Record<City, CityInfo> = {
     id: "atlanta",
     label: "Atlanta",
     flag: "🍑",
+    center: { lat: 33.749, lng: -84.388 },
+    stadium: {
+      name: "Mercedes-Benz Stadium",
+      coords: { lat: 33.7554, lng: -84.4008 },
+    },
     mosques: 3,
     halal: 12,
     transport: [
@@ -76,12 +160,18 @@ export const CITIES: Record<City, CityInfo> = {
       place: "Centennial Olympic Park",
       opens: "2:00 PM · 4h before kickoff",
       note: "Drums, chants & screens — find your people",
+      coords: { lat: 33.7603, lng: -84.3933 },
     },
   },
   newyork: {
     id: "newyork",
     label: "New York",
     flag: "🗽",
+    center: { lat: 40.7128, lng: -74.006 },
+    stadium: {
+      name: "MetLife Stadium",
+      coords: { lat: 40.8128, lng: -74.0742 },
+    },
     mosques: 20,
     halal: 60,
     transport: [
@@ -104,12 +194,18 @@ export const CITIES: Record<City, CityInfo> = {
       place: "Liberty State Park (TBC)",
       opens: "Check the day before kickoff",
       note: "Largest Moroccan diaspora gathering on the East Coast",
+      coords: { lat: 40.7057, lng: -74.0551 },
     },
   },
   boston: {
     id: "boston",
     label: "Boston",
     flag: "🦞",
+    center: { lat: 42.3601, lng: -71.0589 },
+    stadium: {
+      name: "Gillette Stadium",
+      coords: { lat: 42.0909, lng: -71.2643 },
+    },
     mosques: 5,
     halal: 18,
     transport: [
@@ -132,6 +228,40 @@ export const CITIES: Record<City, CityInfo> = {
       place: "Boston Common (TBC)",
       opens: "Check the day before kickoff",
       note: "Meet fellow supporters before heading to Foxborough",
+      coords: { lat: 42.3551, lng: -71.0657 },
     },
   },
 };
+
+// ── Geo & navigation helpers ────────────────────────────────────
+
+/** Haversine distance in km between two points. */
+export function distanceKm(a: GeoPoint, b: GeoPoint): number {
+  const R = 6371;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const lat1 = (a.lat * Math.PI) / 180;
+  const lat2 = (b.lat * Math.PI) / 180;
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+/** Closest host city to a GPS point — used after the user shares location. */
+export function nearestCity(p: GeoPoint): City {
+  return (Object.values(CITIES) as CityInfo[])
+    .map((c) => ({ id: c.id, d: distanceKm(p, c.center) }))
+    .sort((a, b) => a.d - b.d)[0].id;
+}
+
+/** Deep link that opens Google Maps directions to a destination. */
+export function googleMapsUrl(dest: GeoPoint, label?: string): string {
+  const q = label ? encodeURIComponent(label) : `${dest.lat},${dest.lng}`;
+  return `https://www.google.com/maps/dir/?api=1&destination=${dest.lat},${dest.lng}&destination_place_id=&travelmode=transit&query=${q}`;
+}
+
+/** Deep link that opens Waze navigation to a destination. */
+export function wazeUrl(dest: GeoPoint): string {
+  return `https://waze.com/ul?ll=${dest.lat},${dest.lng}&navigate=yes`;
+}

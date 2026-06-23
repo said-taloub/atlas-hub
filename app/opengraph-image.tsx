@@ -154,7 +154,7 @@ export default async function OgImage() {
               display: "flex",
             }}
           >
-            {match.group}
+            {match.round}
           </div>
           <div
             style={{
