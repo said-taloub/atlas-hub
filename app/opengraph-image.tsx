@@ -3,7 +3,7 @@ import { MATCHES, nextMatch } from "@/lib/data";
 
 // Route segment config
 export const runtime = "nodejs";
-export const alt = "Atlas Hub — Morocco at the World Cup 2026";
+export const alt = "Atlas Fan — Morocco at the World Cup 2026";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -70,7 +70,7 @@ export default async function OgImage() {
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ fontSize: 40, fontWeight: 800, letterSpacing: -1 }}>
-              Atlas Hub
+              Atlas Fan
             </div>
             <div
               style={{

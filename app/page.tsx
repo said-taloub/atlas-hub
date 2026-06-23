@@ -92,7 +92,7 @@ export default function Page() {
         <div className="brandrow">
           <div className="star">⭐</div>
           <div className="brand">
-            Atlas Hub
+            Atlas Fan
             <small>Morocco · World Cup 2026</small>
           </div>
           <div className="live">
@@ -321,7 +321,14 @@ export default function Page() {
         </div>
 
         <div className="madeby">
-          Built with ❤️ for Moroccan fans · by <b>@said</b>
+          Built with ❤️ for Moroccan fans · by Saïd{" "}
+          <a
+            href="https://www.instagram.com/ai.in.prod/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            @ai.in.prod
+          </a>
         </div>
       </main>
 

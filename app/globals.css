@@ -199,3 +199,5 @@ body{
 
 .madeby{text-align:center;font-size:10.5px;color:var(--muted);padding:18px 0 6px}
 .madeby b{color:var(--green)}
+.madeby a{color:var(--green);font-weight:700;text-decoration:none}
+.madeby a:hover{text-decoration:underline}

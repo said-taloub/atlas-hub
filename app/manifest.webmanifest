@@ -1,0 +1,17 @@
+{
+  "name": "Atlas Fan — Morocco World Cup 2026",
+  "short_name": "Atlas Fan",
+  "description": "Everything Moroccan fans need at the 2026 World Cup, in one place.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#006233",
+  "theme_color": "#006233",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -255,13 +255,20 @@ export function nearestCity(p: GeoPoint): City {
     .sort((a, b) => a.d - b.d)[0].id;
 }
 
-/** Deep link that opens Google Maps directions to a destination. */
+/** Deep link that opens Google Maps directions to a destination.
+ * Uses the official Maps URL scheme: only `destination` (lat,lng) is required.
+ * The optional label rides along in `destination` text so the pin is named. */
 export function googleMapsUrl(dest: GeoPoint, label?: string): string {
-  const q = label ? encodeURIComponent(label) : `${dest.lat},${dest.lng}`;
-  return `https://www.google.com/maps/dir/?api=1&destination=${dest.lat},${dest.lng}&destination_place_id=&travelmode=transit&query=${q}`;
+  // `destination` accepts either "lat,lng" or a place name. We send the
+  // coordinates (always resolvable) and let Google show transit directions.
+  const destination = label
+    ? encodeURIComponent(`${label} ${dest.lat},${dest.lng}`)
+    : `${dest.lat},${dest.lng}`;
+  return `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=transit`;
 }
 
 /** Deep link that opens Waze navigation to a destination. */
 export function wazeUrl(dest: GeoPoint): string {
-  return `https://waze.com/ul?ll=${dest.lat},${dest.lng}&navigate=yes`;
+  // `ll` = target coords, `navigate=yes` starts routing immediately.
+  return `https://www.waze.com/ul?ll=${dest.lat}%2C${dest.lng}&navigate=yes&zoom=17`;
 }
