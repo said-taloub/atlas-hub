@@ -90,7 +90,8 @@ export default function Page() {
       {/* HERO */}
       <header className="hero">
         <div className="brandrow">
-          <div className="star">⭐</div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="star" src="/icon.svg" alt="Atlas Fan lion" />
           <div className="brand">
             Atlas Fan
             <small>Morocco · World Cup 2026</small>

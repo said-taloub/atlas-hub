@@ -1,16 +1,50 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
   <rect width="512" height="512" rx="112" fill="#006233"/>
-  <!-- Moroccan five-pointed star (pentagram), centered -->
-  <path
-    fill="none"
-    stroke="#C1272D"
-    stroke-width="22"
-    stroke-linejoin="round"
-    d="M256 120
-       L300.9 258.2
-       L185.5 172.8
-       L326.5 172.8
-       L211.1 258.2
-       Z"
-  />
+  <g transform="translate(256 268)">
+    <!-- Mane: a ring of rounded petals around the face -->
+    <g fill="#E8B84B">
+      <circle cx="0" cy="-118" r="34"/>
+      <circle cx="72" cy="-94" r="34"/>
+      <circle cx="118" cy="-34" r="34"/>
+      <circle cx="128" cy="36" r="34"/>
+      <circle cx="96" cy="100" r="34"/>
+      <circle cx="40" cy="140" r="34"/>
+      <circle cx="-40" cy="140" r="34"/>
+      <circle cx="-96" cy="100" r="34"/>
+      <circle cx="-128" cy="36" r="34"/>
+      <circle cx="-118" cy="-34" r="34"/>
+      <circle cx="-72" cy="-94" r="34"/>
+    </g>
+    <!-- Inner mane ring (darker gold for depth) -->
+    <circle cx="0" cy="6" r="118" fill="#D9A53A"/>
+    <!-- Ears -->
+    <circle cx="-86" cy="-70" r="30" fill="#E8B84B"/>
+    <circle cx="86" cy="-70" r="30" fill="#E8B84B"/>
+    <circle cx="-86" cy="-70" r="15" fill="#C1272D"/>
+    <circle cx="86" cy="-70" r="15" fill="#C1272D"/>
+    <!-- Face -->
+    <ellipse cx="0" cy="6" rx="98" ry="100" fill="#F4D27A"/>
+    <!-- Muzzle -->
+    <ellipse cx="0" cy="52" rx="56" ry="44" fill="#FBE9B8"/>
+    <!-- Eyes -->
+    <ellipse cx="-40" cy="-8" rx="15" ry="19" fill="#3A2410"/>
+    <ellipse cx="40" cy="-8" rx="15" ry="19" fill="#3A2410"/>
+    <circle cx="-35" cy="-14" r="5" fill="#fff"/>
+    <circle cx="45" cy="-14" r="5" fill="#fff"/>
+    <!-- Brow accents -->
+    <path d="M-62 -34 Q-40 -48 -18 -36" stroke="#C99A2E" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M62 -34 Q40 -48 18 -36" stroke="#C99A2E" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <!-- Nose -->
+    <path d="M-22 34 L22 34 L0 58 Z" fill="#C1272D"/>
+    <!-- Mouth -->
+    <path d="M0 58 L0 74 M0 74 Q-22 90 -42 76 M0 74 Q22 90 42 76"
+          stroke="#7A4A1E" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <!-- Whisker dots -->
+    <g fill="#C99A2E">
+      <circle cx="-44" cy="60" r="3.5"/>
+      <circle cx="-52" cy="72" r="3.5"/>
+      <circle cx="44" cy="60" r="3.5"/>
+      <circle cx="52" cy="72" r="3.5"/>
+    </g>
+  </g>
 </svg>

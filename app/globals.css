@@ -29,8 +29,8 @@ body{
 .hero::after{content:"";position:absolute;right:-40px;top:-30px;width:180px;height:180px;
   background:radial-gradient(circle, rgba(224,180,58,.25), transparent 70%);}
 .brandrow{display:flex;align-items:center;gap:10px;position:relative;z-index:2}
-.star{width:34px;height:34px;display:grid;place-items:center;
-  background:var(--red);border-radius:10px;box-shadow:0 6px 16px rgba(193,39,45,.45);font-size:18px}
+.star{width:38px;height:38px;display:block;object-fit:cover;
+  border-radius:11px;box-shadow:0 6px 16px rgba(0,0,0,.28)}
 .brand{font-weight:800;letter-spacing:.3px;font-size:18px}
 .brand small{display:block;font-weight:500;opacity:.8;font-size:11px;letter-spacing:.6px;text-transform:uppercase}
 .live{margin-left:auto;font-size:11px;font-weight:700;background:rgba(255,255,255,.14);
